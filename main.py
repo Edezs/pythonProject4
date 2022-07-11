@@ -19,6 +19,6 @@ if __name__ == '__main__':
     time.sleep(3)
     driver.quit()
     #sOskar
- print("fuckbitchesgetmoney")
-#s
+    print("fuckbitchesgetmoney")
+    #s
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
