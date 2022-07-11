@@ -18,12 +18,4 @@ if __name__ == '__main__':
     driver.get('http://www.ebay-kleinanzeigen.de/')
     time.sleep(3)
     driver.quit()
-    #sOskar
-    print("fuckbitchesgetmoney")
-    #s
-    driver.quit()
-    #conflictOs
-    #testsetsetsetset
-    #klasjdnf
-    driver.monkmode()
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
