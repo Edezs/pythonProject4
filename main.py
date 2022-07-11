@@ -24,4 +24,5 @@ if __name__ == '__main__':
     driver.quit()
     #conflictOs
     #testsetsetsetset
+    driver.sex()
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
