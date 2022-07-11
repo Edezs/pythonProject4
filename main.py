@@ -25,4 +25,5 @@ if __name__ == '__main__':
     #conflictOs
     #testsetsetsetset
     #klasjdnf
+    driver.monkmode()
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
