@@ -32,6 +32,12 @@ if __name__ == '__main__':
     search_box.submit()
     time.sleep(1)
 
+    Anzeige = driver.find_element(By.TAG_NAME, "li")
+    print(Anzeige.tag_name)
+    #time.sleep(2)
+    #if (driver.find_element(By.CLASS_NAME)=="aditem"):
+    Anzeige.click()
+
     #pseudocode für einen Suchbegriff
     #anzeige finden
     #wenn werbung, dann überspringen, else
