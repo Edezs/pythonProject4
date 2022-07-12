@@ -72,15 +72,14 @@ driver.find_element(By.XPATH, '//*[@id="gdpr-banner-accept"]').click()
 search('stuhl')
 
 anzeige = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]/li[1]/article/div[1]/a/div/img')  # aditem-image
-ImgSrc = anzeige.get_attribute('src')
-print(ImgSrc)
+ImgSrc = anzeige.get_attribute('src')  # kopiert den Link zum Bild
 
 newTab('images.google.com')
 driver.find_element(By.ID, 'W0wltc').click()  # Google Cookie box ablehnen
 sleep(1)
 driver.find_element(By.CLASS_NAME, 'ZaFQO').click()  # Die kleine Kamera bei Google bilder
 sleep(1)
-googleImageSearchBox = driver.find_element(By.ID, 'Ycyxxc')
+googleImageSearchBox = driver.find_element(By.ID, 'Ycyxxc')  # Google Suchfeld
 googleImageSearchBox.clear()
 print(ImgSrc)
 googleImageSearchBox.send_keys(ImgSrc)
