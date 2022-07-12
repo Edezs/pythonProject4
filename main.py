@@ -2,6 +2,7 @@ from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.common.by import By
 from time import sleep
 from selenium import webdriver
+import pyautogui
 
 # variable oben definieren damit sie global ist und nicht einzeln in jede Funktion übergeben werden muss Variablen
 # und Funktiontsnamen bitte kleinschreiben, zusammengesetzte Wörter bei jedem Anfangsbuchstaben großschreiben und
@@ -9,9 +10,9 @@ from selenium import webdriver
 driver = webdriver.Chrome('/Users/chromedriver')
 
 
-# TODO: Google Image search funktioniert nur auf dem Handy
-# TODO: Captcha
-# TODO: Methode um Anzeigen durchzublättern
+# TODO: Ebay Kleineanzeigen hat imer eine andere REihenfolge wegen Werbung
+# TODO: Methode um Anzeigen durchzublättern auswählen
+# TODO: Telegrambot der die Anzeigen informiert
 
 
 # Hier die Befehle ablegen die man ab und zu benutzt und nicht immer googlen muss
@@ -24,10 +25,11 @@ def usefulSyntax():
     driver.execute_script("window.open('http://bings.com');")
     driver.switch_to.window(driver.window_handles[1])
     # if __name__ == '__main__': #aus convienience erstmal gelöscht
+    print(pyautogui.size())
+    print(pyautogui.onScreen(1504, 0))
 
 
-# wenn man die Funktion aufruft, dann für 'username' die Email einsetzen, usw. ist aber aktuell nicht
-# funktionstüchtig wegen Captcha
+
 def login(username, password):
     loginStartButton = driver.find_element(By.XPATH, '//*[@id="site-signin"]/nav/ul/li[3]/a')
     loginStartButton.click()
@@ -37,8 +39,8 @@ def login(username, password):
     usernameField.send_keys(username)
     passwordField.clear()
     passwordField.send_keys(password)
-    # TODO: Captcha umgehen?
-    # workaround: manuell das captcha machen, ab dann autonom laufen lassen
+
+    # TODO: Captcha
     driver.find_element(By.ID, 'login-submit').click()
     return
 
@@ -64,31 +66,44 @@ def search(name):
     searchBox.submit()
 
 
+def oldGoogleSearch(anzeige):
+    ImgSrc = anzeige.get_attribute('src')  # kopiert den Link zum Bild
+    newTab('images.google.com')
+    driver.find_element(By.ID, 'W0wltc').click()  # Google Cookie box ablehnen
+    sleep(1)
+    driver.find_element(By.CLASS_NAME, 'ZaFQO').click()  # Die kleine Kamera bei Google bilder
+    sleep(1)
+    googleImageSearchBox = driver.find_element(By.ID, 'Ycyxxc')  # Google Suchfeld
+    googleImageSearchBox.clear()
+    print(ImgSrc)
+    googleImageSearchBox.send_keys(ImgSrc)
+    googleImageSearchBox.submit()
+
+
 # Diese Line kann man sich theoretisch sparen, wäre vielleicht übersichtlicher aber sie erfüllt wohl irgendein
 # Sicherheitsfeature, dass man die Mainmethode nicht ausversehen aufruft
 
 driver.get('https://www.ebay-kleinanzeigen.de/')
+driver.maximize_window()
 driver.find_element(By.XPATH, '//*[@id="gdpr-banner-accept"]').click()
+sleep(2)
 search('stuhl')
+sleep(3)
 
-anzeige = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]/li[1]/article/div[1]/a/div/img')  # aditem-image
-ImgSrc = anzeige.get_attribute('src')  # kopiert den Link zum Bild
+#anzeige = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]/li[1]/article/div[1]/a/div/img')  # aditem-image
+anzeigen = driver.find_elements(By.CLASS_NAME, 'aditem-image')
+#oldGoogleSearch(anzeige)
+#driver.close()
 
-newTab('images.google.com')
-driver.find_element(By.ID, 'W0wltc').click()  # Google Cookie box ablehnen
+action = ActionChains(driver)
+
+pyautogui.moveTo(600, 370)
+pyautogui.scroll(-25)
+
+action.context_click(anzeigen[2]).perform() #klickt die 3. Anzeige an (1. wirkliche Anzeige)
+pyautogui.move(30,280) #moved die Maus auf den Lens knopf
+pyautogui.leftClick()
 sleep(1)
-driver.find_element(By.CLASS_NAME, 'ZaFQO').click()  # Die kleine Kamera bei Google bilder
-sleep(1)
-googleImageSearchBox = driver.find_element(By.ID, 'Ycyxxc')  # Google Suchfeld
-googleImageSearchBox.clear()
-print(ImgSrc)
-googleImageSearchBox.send_keys(ImgSrc)
-googleImageSearchBox.submit()
+#pyautogui.moveTo(300,40)
+#pyautogui.leftClick()
 
-# for i in range(6):
-#     anzeige = driver.find_element(By.CLASS_NAME, 'aditem-image')
-#     print(anzeige.id)
-#     driver.refresh()
-#     sleep(2)
-
-# option 1, immer die erste anzeige prüfen, dann refreshen
