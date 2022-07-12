@@ -1,81 +1,95 @@
-from selenium.webdriver import Keys
+from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.common.by import By
 from time import sleep
 from selenium import webdriver
-from selenium.webdriver.support import ui
+
+# variable oben definieren damit sie global ist und nicht einzeln in jede Funktion übergeben werden muss Variablen
+# und Funktiontsnamen bitte kleinschreiben, zusammengesetzte Wörter bei jedem Anfangsbuchstaben großschreiben und
+# zusammen, wie bruttoSozialProdukt
+driver = webdriver.Chrome('/Users/chromedriver')
 
 
-def checkFoto(foto):
+# TODO: Google Image search funktioniert nur auf dem Handy
+# TODO: Captcha
+# TODO: Methode um Anzeigen durchzublättern
+
+
+# Hier die Befehle ablegen die man ab und zu benutzt und nicht immer googlen muss
+def usefulSyntax():
+    driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.COMMAND + 't')  # allgemeine Form für cmd +t eintippen
+    driver.refresh()  # site aktualisieren
+    driver.back()  # geht eine Seite zurück, allerdings nicht sure wie es genau funktioniert
+    driver.execute_script("window.open('http://bings.com', '_blank');")  # neuen Tab öffnen
+    ActionChains(driver).key_down(Keys.COMMAND).send_keys('t').key_up(Keys.COMMAND).perform()  # funktioniert nicht
+    driver.execute_script("window.open('http://bings.com');")
+    driver.switch_to.window(driver.window_handles[1])
+    # if __name__ == '__main__': #aus convienience erstmal gelöscht
+
+
+# wenn man die Funktion aufruft, dann für 'username' die Email einsetzen, usw. ist aber aktuell nicht
+# funktionstüchtig wegen Captcha
+def login(username, password):
+    loginStartButton = driver.find_element(By.XPATH, '//*[@id="site-signin"]/nav/ul/li[3]/a')
+    loginStartButton.click()
+    usernameField = driver.find_element(By.NAME, 'loginMail')
+    passwordField = driver.find_element(By.NAME, 'password')
+    usernameField.clear()
+    usernameField.send_keys(username)
+    passwordField.clear()
+    passwordField.send_keys(password)
+    # TODO: Captcha umgehen?
+    # workaround: manuell das captcha machen, ab dann autonom laufen lassen
+    driver.find_element(By.ID, 'login-submit').click()
     return
 
 
-if __name__ == '__main__':
+# just experimenting with opening a new tab
+def newTab(url):
+    driver.execute_script(f"window.open('https://{url}');")  # String interpolation
+    driver.switch_to.window(driver.window_handles[1])
+    # driver.get(f'http://{url}')
+    sleep(3)
 
-    driver = webdriver.Chrome('/Users/chromedriver')
-    driver.get('http://www.ebay-kleinanzeigen.de/')
-    sleep(1)
-    cookieAcceptBox = driver.find_element(By.XPATH, '//*[@id="gdpr-banner-accept"]')
-    cookieAcceptBox.click()
 
+# gibt Probleme, weil ebay dann immer wieder fragt
+def denyCookie():
+    cookieDenyBox = driver.find_element(By.ID, 'gdpr-banner-cmp-button')
+    cookieDenyBox.click()
+    driver.find_element(By.XPATH, '//*[@id="ConsentManagementPage"]/div[1]/button[1]').click()
+
+
+def search(name):
     searchBox = driver.find_element(By.XPATH, '//*[@id="site-search-query"]')
-    searchBox.send_keys('stuhl')
+    searchBox.send_keys(name)
     searchBox.submit()
-    sleep(1)
-    #TODO: check if
-    anzeigen = driver.find_elements(By.CLASS_NAME, 'aditem-image')
-
-    for i in range(6):
-        anzeige = driver.find_element(By.CLASS_NAME, 'aditem-image')
-        print(anzeige.id)
-        driver.get('https://www.google.com?q=python#q=python')
-        sleep(2)
-        first_result = ui.WebDriverWait(driver, 15).until(lambda browser: browser.find_element_by_class_name('rc'))
-        first_link = first_result.find_element_by_tag_name('a')
-
-        # Save the window opener (current window, do not mistaken with tab... not the same)
-        main_window = driver.current_window_handle
-
-        # Open the link in a new tab by sending key strokes on the element
-        # Use: Keys.CONTROL + Keys.SHIFT + Keys.RETURN to open tab on top of the stack
-        first_link.send_keys(Keys.CONTROL + Keys.RETURN)
-
-        # Switch tab to the new tab, which we will assume is the next one on the right
-        driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.TAB)
-
-        # Put focus on current window which will, in fact, put focus on the current visible tab
-        driver.switch_to_window(main_window)
-
-        # do whatever you have to do on this page, we will just got to sleep for now
-        sleep(2)
-
-        # Close current tab
-        driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
-
-        # Put focus on current window which will be the window opener
-        driver.switch_to_window(main_window)
-     #   print(anzeige.id)
-      #  #anzeige.click()
-       # #time.sleep(1)
-        ##driver.back()
-        #driver.get("https://www.tutorialspoint.com/questions/index.php")
-      #  print("Current Page title: " + driver.title)
-       # driver.back()
 
 
-    #option 1, immer die erste anzeige prüfen
+# Diese Line kann man sich theoretisch sparen, wäre vielleicht übersichtlicher aber sie erfüllt wohl irgendein
+# Sicherheitsfeature, dass man die Mainmethode nicht ausversehen aufruft
 
-    #pseudocode für einen Suchbegriff
-    #anzeige finden
-    #wenn werbung, dann überspringen, else
-    #wenn anzeigenID nicht im Array gepruefte_Anzeigen enthalten ist, dann gleiches für die nächste Anzeigenid prüfen
-    #wenn anzeigenid im Array gepruefte_Anzeigen enthalten ist, dann gehe zu der vorhergehenden Anzeige
-    #     #   anklicken
-    #     #   3+ fotos bei Google Bildersuche suchen
-    #     #   wenn die ersten 10 suchergebnisse eines der stichwörter enthalten, dann anzeigenlink sichern in einer liste (stichwörter müssen wir alle auflisten)
-    #     #   anzeigenid sichern in Liste gepruefte_Anzeigen
-    #     #   zurück gehen in stuhlsuche bei EK und algorithmus erneut ausführen
-    # wenn anzeigenid im Array gepruefte_Anzeigen enthalten ist und es darüber keine neuen Anzeigen gibt, dann
-    #     #   sleep für 1200s, dann neu ausführen
+driver.get('https://www.ebay-kleinanzeigen.de/')
+driver.find_element(By.XPATH, '//*[@id="gdpr-banner-accept"]').click()
+search('stuhl')
 
+anzeige = driver.find_element(By.XPATH, '//*[@id="srchrslt-adtable"]/li[1]/article/div[1]/a/div/img')  # aditem-image
+ImgSrc = anzeige.get_attribute('src')
+print(ImgSrc)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+newTab('images.google.com')
+driver.find_element(By.ID, 'W0wltc').click()  # Google Cookie box ablehnen
+sleep(1)
+driver.find_element(By.CLASS_NAME, 'ZaFQO').click()  # Die kleine Kamera bei Google bilder
+sleep(1)
+googleImageSearchBox = driver.find_element(By.ID, 'Ycyxxc')
+googleImageSearchBox.clear()
+print(ImgSrc)
+googleImageSearchBox.send_keys(ImgSrc)
+googleImageSearchBox.submit()
+
+# for i in range(6):
+#     anzeige = driver.find_element(By.CLASS_NAME, 'aditem-image')
+#     print(anzeige.id)
+#     driver.refresh()
+#     sleep(2)
+
+# option 1, immer die erste anzeige prüfen, dann refreshen
